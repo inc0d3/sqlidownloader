@@ -28,7 +28,11 @@ def download_file(f):
 		return dest
 
 #########################################################################################################
-
+print("""
+    SQLiDownloader - Automatic file downloader tool
+    escrito por Victor Herrera
+    www.zeroday.cl
+""")
 print("[*] Iniciando descarga")
 		
 if os.path.isdir("output"):
