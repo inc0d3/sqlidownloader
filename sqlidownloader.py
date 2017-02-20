@@ -18,7 +18,11 @@ def download_file(f):
 	filed = patron.findall(ret)
 	if len(filed) > 0:	
 		p, a = os.path.split(f)
-		dest = "output/" + dirw + "/" + a		
+		p += "//"
+		if len(p.replace(droot,"")) > 0:
+			dest = "output/" + dirw + "/" + p.replace(droot,"") + a
+		else:
+			dest = "output/" + dirw + "/" + a
 		#os.rename(filed[0],dest)
 		print("[+] Descargado el archivo " + f + "")
 		return dest
@@ -33,15 +37,11 @@ else:
 	os.makedirs("output")
 	print ("[+] Directorio output creado")
 
-os.chdir("output")
-
-if os.path.isdir(dirw):
+if os.path.isdir("output/" + dirw):
 	print ("[+] Directorio " + dirw + " creado")
 else:
 	os.makedirs(dirw)
 	print ("[+] Directorio " + dirw + " creado")
-
-os.chdir("..")
 
 while (files):
 	nf = download_file(files.pop())
@@ -54,11 +54,18 @@ while (files):
 			fc = ""
 			print ("[*] Error: no se puede abrir el archivo: " + nf)
 
-		patron = re.compile("require.*['\"](.*?)[\"']")
+		patron = re.compile("require.*['\"](.*?)[\"']|include.*['\"](.*?)[\"']|form.*action=['\"](.*?)[\"']|header\(\"[L,l]ocation:\s(.*?)[\"']")
 		fs = patron.findall(fc)
-		for i in fs:
-			files.append(droot + i)
-			print("[-] Agregado " + droot + i + " a la cola...")		
+		for j in fs:
+			for i in j:
+				if len(i) > 0:				
+					files.append(droot + i)
+					if len(os.path.split(i)[0]) > 0:
+						try:
+							os.makedirs("output/" + dirw + "/" + os.path.split(i)[0])
+						except OSError:
+							pass
+					print("[-] Agregado " + droot + i + " a la cola...")		
 
 print "[*] Descarga masiva finalizada en " + dirw
 
